@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام صيانة  محطة تشرين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --electric: #00c6ff;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
+            --border: #334155;
+            --text-gray: #94a3b8;
+            /* ألوان الحالات المطلوبة */
+            --status-urgent: #ef4444; 
+            --status-normal: rgb(182, 182, 93);     
+            --status-Whenstopping: #10b981; 
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at top, #7b808a, #0f172a);
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-title {
+            text-align: center;
+            background:  linear-gradient(135deg, #00c6ff, #0072ff);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,198,255,0.3);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group { display: flex; flex-direction: column; }
+        .full-width { grid-column: 1 / -1; }
+
+        label {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-gray);
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--electric);
+            box-shadow: 0 0 15px rgba(0,198,255,0.4);
+        }
+
+        /* تنسيق صندوق الحالة الملون */
+        #statusBox {
+            margin-top: 15px;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.4s;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* فئات الألوان للحالة */
+
+        .bg-urgent { background: rgba(239, 68, 68, 0.2) !important; color: #ef4444; border-color: #ef4444 !important; }
+        .bg-normal { background: rgba(16, 185, 129, 0.2) !important; color: yellow; border-color: yellow !important; }
+        .bg-Whenstopping { background: rgba(107, 114, 128, 0.2) !important; color: #10b981; border-color: #10b981 !important; }
+
+        .btn-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,198,255,0.4); }
+
+        .btn-reset { background: linear-gradient(135deg, #00c6ff, #0072ff);
+        color: white;
+        font-weight: bold;
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            .header-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">إدخال صيانة المحطة</div>
+
+    <form id="maintenanceForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>المجموعة</label>
+                <select required>
+                    <option disabled selected>اختر المجموعة</option>
+                    <option> البخارية الأولى</option>
+                    <option> البخارية الثانية</option>
+                    <option>   الغازية الأولى</option>
+                    <option> الغازية الثانية </option>
+                    <option>   غازية أولى -مركبة </option>
+                    <option>   غازية ثانية -مركبة </option>
+                    <option>   بخارية  -مركبة </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>رقم طلب الصيانة</label>
+                <input type="number" placeholder="أدخل رقم الطلب">
+            </div>
+
+            <div class="form-group">
+                <label>تاريخ الطلب</label>
+                <input type="date" required>
+            </div>
+
+            <div class="form-group">
+                <label>نوع العمل</label>
+                <select required>
+                    <option disabled selected>اختر نوع العمل</option>
+                    <option>كهرباء</option>
+                    <option>ميكانيك</option>
+                    <option>تحكم</option>
+                    <option>كيمياء </option>
+                    <option>مرافق </option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label>موضوع الطلب</label>
+                <input type="text" placeholder="عنوان مختصر للمشكلة">
+            </div>
+
+            <div class="form-group">
+                <label>وضع الطلب</label>
+                <select required>
+                    <option disabled selected>اختر وضع الطلب</option>
+                    <option>قيد التنفيذ</option>
+                    <option>قيد الاختبتار</option>
+                    <option >تم التنفيذ</option>
+                 text.option.option.add("bg-Whenstopping");
+                
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>الحالة</label>
+                <select id="statusSelect" required>
+                    <option disabled selected>اختر الحالة</option>
+                    <option value="urgent">عاجل</option>
+                    <option value="normal">عادي </option>
+                    <option value="Whenstopping">لحين التوقف</option>
+                </select>
+                <div id="statusBox">يرجى تحديد الحالة</div>
+            </div>
+
+            <div class="form-group full-width">
+                <label>الأعمال المنفذة</label>
+                <textarea placeholder="ما الذي تم إنجازه؟"></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label>ملاحظات</label>
+                <textarea placeholder="أي ملاحظات إضافية"></textarea>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" class="btn-submit">إرسال البيانات</button>
+            <button type="reset" class="btn-reset">إعادة تعيين</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const select = document.getElementById("statusSelect");
+    const box = document.getElementById("statusBox");
+
+    select.addEventListener("change", function() {
+        // إزالة الألوان السابقة
+        box.classList.remove( "bg-urgent", "bg-done", "bg-closed");
+        
+        // إضافة اللون الجديد وتغيير النص بناءً على طلبك
+        if(this.value === "urgent") {
+            box.textContent = "الحالة: عاجل";
+            box.classList.add("bg-urgent");
+        } else if(this.value === "normal") {
+            box.textContent = "الحالة: عادي   ";
+            box.classList.add("bg-normal");
+        } else if(this.value === "Whenstopping") {
+            box.textContent = "الحالة:  لحين التوقف";
+            box.classList.add("bg-Whenstopping");
+        } 
+        
+    });
+</script>
+
+</body>
+</html>
