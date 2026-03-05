@@ -1,245 +1,436 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام صيانة المحطة الاحترافي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --electric: #00c6ff;
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --input-bg: #0f172a;
-            --border: #334155;
-            --text-gray: #94a3b8;
-            /* ألوان الحالات المطلوبة */
-            --status-new: #3b82f6;      /* أزرق */
-            --status-progress: #ef4444; /* أحمر */
-            --status-done: #10b981;     /* أخضر */
-            --status-closed: #6b7280;   /* رمادي */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام صيانة محطة تشرين</title>
 
-        body {
-            margin: 0;
-            font-family: 'Cairo', sans-serif;
-            background: radial-gradient(circle at top, #1e293b, #0f172a);
-            color: white;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
+<style>
+:root{
+--primary:#54bcec;
+--primary-dark:#1c2e7e;
+--bg:#0b1220;
+--card:rgba(55, 69, 92, 0.85);
+--input:#434f64;
+--border:#1f2a3d;
+--text:#e2e8f0;
+--muted:#b3bfce;
+--success:#10b981;
+--danger:#ef4444;
+--warning:#facc15;
+}
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+*{box-sizing:border-box}
 
-        .header-title {
-            text-align: center;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 40px;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,198,255,0.3);
-        }
+body{
+margin:0;
+font-family:'Cairo',sans-serif;
+background:linear-gradient(160deg,#394d75,#415583);
+color:var(--text);
+display:flex;
+justify-content:center;
+align-items: center; /* لضمان توسط الفورم */
+min-height: 100vh;
+padding:40px 20px;
+}
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
+/* شاشة تسجيل الدخول */
+#loginSection {
+    width: 100%;
+    max-width: 450px;
+    background: var(--card);
+    backdrop-filter: blur(18px);
+    border-radius: 28px;
+    padding: 50px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    text-align: center;
+    animation: fadeIn .6s ease;
+}
 
-        .form-group { display: flex; flex-direction: column; }
-        .full-width { grid-column: 1 / -1; }
+/* إخفاء الفورم الأساسي في البداية */
+#mainContainer {
+    display: none;
+    width:100%;
+    max-width:950px;
+}
 
-        label {
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-gray);
-            font-weight: bold;
-        }
+.container{
+width:100%;
+background:var(--card);
+backdrop-filter:blur(18px);
+border-radius:28px;
+padding:55px;
+border:1px solid rgba(255,255,255,0.06);
+box-shadow:0 40px 80px rgba(0,0,0,0.6);
+animation:fadeIn .6s ease;
+}
 
-        input, select, textarea {
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--input-bg);
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(25px)}
+to{opacity:1;transform:translateY(0)}
+}
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--electric);
-            box-shadow: 0 0 15px rgba(0,198,255,0.4);
-        }
+.header-title{
+text-align:center;
+font-size:26px;
+font-weight:700;
+padding:24px;
+margin-bottom:55px;
+border-radius:20px;
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+box-shadow:0 20px 40px rgba(43, 106, 133, 0.4);
+color: white;
+}
 
-        /* تنسيق صندوق الحالة الملون */
-        #statusBox {
-            margin-top: 15px;
-            padding: 15px;
-            text-align: center;
-            border-radius: 10px;
-            font-weight: bold;
-            transition: 0.4s;
-            border: 2px solid transparent;
-            background: rgba(255,255,255,0.05);
-        }
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:30px;
+}
 
-        /* فئات الألوان للحالة */
-        .bg-new { background: rgba(59, 130, 246, 0.2) !important; color: #3b82f6; border-color: #3b82f6 !important; }
-        .bg-progress { background: rgba(239, 68, 68, 0.2) !important; color: #ef4444; border-color: #ef4444 !important; }
-        .bg-done { background: rgba(16, 185, 129, 0.2) !important; color: #10b981; border-color: #10b981 !important; }
-        .bg-closed { background: rgba(107, 114, 128, 0.2) !important; color: #9ca3af; border-color: #9ca3af !important; }
+.form-group{
+display:flex;
+flex-direction:column;
+position:relative;
+text-align: right;
+}
 
-        .btn-container {
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
-        }
+.full-width{
+grid-column:1/-1;
+}
 
-        button {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+label{
+margin-bottom:10px;
+font-size:16px;
+font-weight:600;
+font-weight:bold;
+color:var(--muted);
+}
 
-        .btn-submit {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            color: white;
-        }
+input,select,textarea{
+background:var(--input);
+border:1px solid var(--border);
+border-radius:16px;
+padding:16px;
+font-size:16px;
+color:var(--text);
+transition:.3s;
+text-align: right;
+}
 
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,198,255,0.4); }
+input:hover,select:hover,textarea:hover{
+border-color:var(--primary);
+}
 
-        .btn-reset { background: #334155; color: white; }
+input:focus,select:focus,textarea:focus{
+outline:none;
+border-color:var(--primary);
+box-shadow:0 0 0 3px rgba(14,165,233,0.25);
+}
 
-        @media (max-width: 600px) {
-            .container { padding: 20px; }
-            .header-title { font-size: 20px; }
-        }
-    </style>
+textarea{
+min-height:130px;
+resize:vertical;
+}
+
+#statusBox{
+margin-top:15px;
+padding:14px;
+border-radius:14px;
+font-weight:600;
+text-align:center;
+background:rgba(255,255,255,0.04);
+border:1px solid var(--border);
+transition:.3s;
+}
+
+.bg-urgent{
+background:rgba(239,68,68,0.15)!important;
+color:var(--danger);
+border-color:var(--danger)!important;
+}
+
+.bg-normal{
+background:rgba(250,204,21,0.15)!important;
+color:var(--warning);
+border-color:var(--warning)!important;
+}
+
+.bg-Whenstopping{
+background:rgba(16,185,129,0.15)!important;
+color:var(--success);
+border-color:var(--success)!important;
+}
+
+.btn-container{
+margin-top:50px;
+display:flex;
+gap:20px;
+}
+
+button{
+flex:1;
+padding:18px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+}
+
+.btn-submit, .btn-login{
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+color:white;
+box-shadow:0 15px 35px rgba(14,165,233,0.35);
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+}
+
+.btn-submit:hover, .btn-login:hover{
+transform:translateY(-4px);
+box-shadow:0 25px 45px rgba(14,165,233,0.55);
+filter: brightness(1.1);
+}
+
+.btn-reset{
+background:rgba(255,255,255,0.05);
+color:white;
+border: 1px solid var(--border);
+}
+
+.btn-reset:hover{
+background:#993232;
+}
+
+.spinner{
+width:18px;
+height:18px;
+border:3px solid rgba(255,255,255,0.3);
+border-top:3px solid white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+.toast{
+position:fixed;
+bottom:30px;
+left:30px;
+padding:16px 24px;
+border-radius:16px;
+font-weight:600;
+color:white;
+box-shadow:0 20px 40px rgba(0,0,0,0.4);
+animation:slideIn .4s ease;
+z-index:9999;
+}
+
+@keyframes slideIn{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:600px){
+.container, #loginSection{padding:30px 20px}
+.header-title{font-size:20px}
+}
+</style>
 </head>
+
 <body>
 
-<div class="container">
+<div id="loginSection">
+    <div class="header-title" style="margin-bottom: 30px;">تسجيل الدخول</div>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label>اسم المستخدم</label>
+        <input type="text" id="userInput" placeholder="أدخل اسم المستخدم">
+    </div>
+    <div class="form-group" style="margin-bottom: 30px;">
+        <label>كلمة السر</label>
+        <input type="password" id="passInput" placeholder="******">
+    </div>
+    <button class="btn-login" onclick="validateLogin()">دخول</button>
+    <p id="errorMsg" style="color: var(--danger); margin-top: 15px; display: none; font-weight: bold;">اسم المستخدم أو كلمة السر خطأ!</p>
+</div>
+
+<div id="mainContainer" class="container">
     <div class="header-title">إدخال صيانة المحطة</div>
 
     <form id="maintenanceForm">
+        <input type="hidden" name="station" value="تشرين">
+        <input type="hidden" name="currentUser" id="currentUserHidden">
+
         <div class="form-grid">
             <div class="form-group">
                 <label>المجموعة</label>
-                <select required>
-                    <option disabled selected>اختر المجموعة</option>
-                    <option>محطة الكهرباء الرئيسية</option>
-                    <option>محطة التوليد الشمالية</option>
-                    <option>محطة التحويل 1</option>
-                    <option>محطة الطوارئ</option>
+                <select name="groupName" required>
+                    <option disabled selected value="">اختر المجموعة</option>
+                    <option> البخارية الأولى</option>
+                    <option> البخارية الثانية</option>
+                    <option> الغازية الأولى</option>
+                    <option> الغازية الثانية </option>
+                    <option> غازية أولى -مركبة </option>
+                    <option> غازية ثانية -مركبة </option>
+                    <option> بخارية -مركبة </option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>رقم طلب الصيانة</label>
-                <input type="number" placeholder="أدخل رقم الطلب">
+                <input type="text" name="orderNum" placeholder="أدخل رقم الطلب" required>
             </div>
 
             <div class="form-group">
                 <label>تاريخ الطلب</label>
-                <input type="date" required>
+                <input type="date" name="orderDate" required>
             </div>
 
             <div class="form-group">
                 <label>نوع العمل</label>
-                <select required>
-                    <option disabled selected>اختر نوع العمل</option>
+                <select name="workType" required>
+                    <option disabled selected value="">اختر نوع العمل</option>
                     <option>كهرباء</option>
-                    <option>سباكة</option>
-                    <option>تكييف</option>
-                    <option>صيانة عامة</option>
+                    <option>ميكانيك</option>
+                    <option>تحكم</option>
+                    <option>كيمياء </option>
+                    <option>مرافق </option>
                 </select>
-            </div>
-
-            <div class="form-group full-width">
-                <label>موضوع الطلب</label>
-                <input type="text" placeholder="عنوان مختصر للمشكلة">
             </div>
 
             <div class="form-group">
                 <label>وضع الطلب</label>
-                <select required>
-                    <option disabled selected>اختر وضع الطلب</option>
-                    <option>عادي</option>
-                    <option>مستعجل</option>
-                    <option>طارئ</option>
+                <select name="orderPos" required>
+                    <option disabled selected value="">اختر وضع الطلب</option>
+                    <option>قيد التنفيذ</option>
+                    <option>قيد الاختبار</option>
+                    <option>تم التنفيذ</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>الحالة</label>
-                <select id="statusSelect" required>
-                    <option disabled selected>اختر الحالة</option>
-                    <option value="new">جديد</option>
-                    <option value="progress">قيد التنفيذ</option>
-                    <option value="done">مكتمل</option>
-                    <option value="closed">مغلق</option>
+                <select id="statusSelect" name="status" required>
+                    <option disabled selected value="">اختر الحالة</option>
+                    <option value="عاجل" >عاجل</option>
+                    <option value="عادي" >عادي </option>
+                    <option value="لحين التوقف"  >لحين التوقف</option>
                 </select>
                 <div id="statusBox">يرجى تحديد الحالة</div>
             </div>
 
             <div class="form-group full-width">
+                <label>موضوع الطلب</label>
+                <textarea name="subject" placeholder="عنوان مختصر"></textarea>
+            </div>
+
+            <div class="form-group full-width">
                 <label>الأعمال المنفذة</label>
-                <textarea placeholder="ما الذي تم إنجازه؟"></textarea>
+                <textarea name="doneWork" placeholder="ما الذي تم إنجازه؟"></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label>القطع التبديلية المستخدمة </label>
+                <textarea name="spareParts" placeholder="ما القطع التبديلية التي تم استخدامها"></textarea>
             </div>
 
             <div class="form-group full-width">
                 <label>ملاحظات</label>
-                <textarea placeholder="أي ملاحظات إضافية"></textarea>
+                <textarea name="notes" placeholder="أي ملاحظات إضافية"></textarea>
             </div>
         </div>
 
         <div class="btn-container">
-            <button type="submit" class="btn-submit">إرسال البيانات</button>
-            <button type="reset" class="btn-reset">إعادة تعيين</button>
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span>إرسال البيانات</span>
+            </button>
+            <button type="reset" class="btn-reset" onclick="resetUI()">إعادة تعيين</button>
         </div>
     </form>
 </div>
 
 <script>
-    const select = document.getElementById("statusSelect");
-    const box = document.getElementById("statusBox");
+// --- نظام المستخدمين (5 مستخدمين) ---
+const allowedUsers = {
+    "admin1": "1001",
+    "admin2": "1002",
+    "admin3": "1003",
+    "admin4": "1004",
+    "admin5": "1005"
+};
 
-    select.addEventListener("change", function() {
-        // إزالة الألوان السابقة
-        box.classList.remove("bg-new", "bg-progress", "bg-done", "bg-closed");
-        
-        // إضافة اللون الجديد وتغيير النص بناءً على طلبك
-        if(this.value === "new") {
-            box.textContent = "الحالة: جديد";
-            box.classList.add("bg-new");
-        } else if(this.value === "progress") {
-            box.textContent = "الحالة: قيد التنفيذ (أحمر)";
-            box.classList.add("bg-progress");
-        } else if(this.value === "done") {
-            box.textContent = "الحالة: مكتمل (أخضر)";
-            box.classList.add("bg-done");
-        } else if(this.value === "closed") {
-            box.textContent = "الحالة: مغلق";
-            box.classList.add("bg-closed");
-        }
+function validateLogin() {
+    const user = document.getElementById("userInput").value;
+    const pass = document.getElementById("passInput").value;
+    const error = document.getElementById("errorMsg");
+
+    if (allowedUsers[user] && allowedUsers[user] === pass) {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("mainContainer").style.display = "block";
+        document.getElementById("currentUserHidden").value = user; // حفظ الاسم للإرسال
+    } else {
+        error.style.display = "block";
+    }
+}
+
+// --- كودك الأصلي دون تعديل على المنطق ---
+const scriptURL = 'https://script.google.com/macros/s/AKfycbzD1zzmHc7HVAhZvXNTxU1KZuM35dD91EPsp31Egs6-DI7ALwnfYpLf5LpR45dab0tb/exec';
+const form=document.getElementById("maintenanceForm");
+const submitBtn=document.getElementById("submitBtn");
+const select=document.getElementById("statusSelect");
+const box=document.getElementById("statusBox");
+
+function resetUI() {
+    box.textContent="يرجى تحديد الحالة";
+    box.classList.remove("bg-urgent","bg-normal","bg-Whenstopping");
+}
+
+select.addEventListener("change",function(){
+    box.classList.remove("bg-urgent","bg-normal","bg-Whenstopping");
+    if(this.value==="عاجل"){
+        box.textContent="الحالة: عاجل";
+        box.classList.add("bg-urgent");
+    }
+    else if(this.value==="عادي"){
+        box.textContent="الحالة: عادي";
+        box.classList.add("bg-normal");
+    }
+    else if(this.value==="لحين التوقف"){
+        box.textContent="الحالة: لحين التوقف";
+        box.classList.add("bg-Whenstopping");
+    }
+});
+
+form.addEventListener("submit",function(e){
+    e.preventDefault();
+    submitBtn.disabled=true;
+    submitBtn.innerHTML='<div class="spinner"></div> جاري الإرسال';
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    .then(response => {
+        submitBtn.disabled=false;
+        submitBtn.innerHTML='<span>إرسال البيانات</span>';
+        const toast=document.createElement("div");
+        toast.className="toast";
+        toast.style.background="linear-gradient(135deg,#10b981,#059669)";
+        toast.textContent="تم إرسال البيانات بنجاح ✔";
+        document.body.appendChild(toast);
+        setTimeout(()=>toast.remove(),3000);
+        form.reset();
+        resetUI();
+    })
+    .catch(error => {
+        submitBtn.disabled=false;
+        submitBtn.innerHTML='<span>إرسال البيانات</span>';
+        alert("حدث خطأ في الإرسال، يرجى المحاولة مرة أخرى");
     });
+});
 </script>
 
 </body>
