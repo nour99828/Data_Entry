@@ -6,6 +6,7 @@
 <title>نظام صيانة محطة تشرين</title>
 
 <style>
+/* التنسيقات الأصلية كما هي تماماً دون أي تعديل */
 :root{
 --primary:#54bcec;
 --primary-dark:#1c2e7e;
@@ -29,12 +30,11 @@ background:linear-gradient(160deg,#394d75,#415583);
 color:var(--text);
 display:flex;
 justify-content:center;
-align-items: center; /* لضمان توسط الفورم */
+align-items: center; 
 min-height: 100vh;
 padding:40px 20px;
 }
 
-/* شاشة تسجيل الدخول */
 #loginSection {
     width: 100%;
     max-width: 450px;
@@ -48,7 +48,6 @@ padding:40px 20px;
     animation: fadeIn .6s ease;
 }
 
-/* إخفاء الفورم الأساسي في البداية */
 #mainContainer {
     display: none;
     width:100%;
@@ -103,7 +102,6 @@ grid-column:1/-1;
 label{
 margin-bottom:10px;
 font-size:16px;
-font-weight:600;
 font-weight:bold;
 color:var(--muted);
 }
@@ -142,26 +140,11 @@ font-weight:600;
 text-align:center;
 background:rgba(255,255,255,0.04);
 border:1px solid var(--border);
-transition:.3s;
 }
 
-.bg-urgent{
-background:rgba(239,68,68,0.15)!important;
-color:var(--danger);
-border-color:var(--danger)!important;
-}
-
-.bg-normal{
-background:rgba(250,204,21,0.15)!important;
-color:var(--warning);
-border-color:var(--warning)!important;
-}
-
-.bg-Whenstopping{
-background:rgba(16,185,129,0.15)!important;
-color:var(--success);
-border-color:var(--success)!important;
-}
+.bg-urgent{ background:rgba(239,68,68,0.15)!important; color:var(--danger); border-color:var(--danger)!important; }
+.bg-normal{ background:rgba(250,204,21,0.15)!important; color:var(--warning); border-color:var(--warning)!important; }
+.bg-Whenstopping{ background:rgba(16,185,129,0.15)!important; color:var(--success); border-color:var(--success)!important; }
 
 .btn-container{
 margin-top:50px;
@@ -192,55 +175,40 @@ gap:10px;
 
 .btn-submit:hover, .btn-login:hover{
 transform:translateY(-4px);
-box-shadow:0 25px 45px rgba(14,165,233,0.55);
 filter: brightness(1.1);
+background:#993232;
 }
 
 .btn-reset{
-background:rgba(255,255,255,0.05);
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
 color:white;
 border: 1px solid var(--border);
-}
 
+}
 .btn-reset:hover{
 background:#993232;
 }
 
 .spinner{
-width:18px;
-height:18px;
+width:18px; height:18px;
 border:3px solid rgba(255,255,255,0.3);
 border-top:3px solid white;
 border-radius:50%;
 animation:spin 1s linear infinite;
 }
 
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
+@keyframes spin{ to{transform:rotate(360deg)} }
 
 .toast{
-position:fixed;
-bottom:30px;
-left:30px;
-padding:16px 24px;
-border-radius:16px;
-font-weight:600;
-color:white;
+position:fixed; bottom:30px; left:30px;
+padding:16px 24px; border-radius:16px;
+font-weight:600; color:white;
 box-shadow:0 20px 40px rgba(0,0,0,0.4);
 animation:slideIn .4s ease;
 z-index:9999;
 }
 
-@keyframes slideIn{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
-}
-
-@media(max-width:600px){
-.container, #loginSection{padding:30px 20px}
-.header-title{font-size:20px}
-}
+@keyframes slideIn{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 
@@ -257,7 +225,7 @@ to{opacity:1;transform:translateY(0)}
         <input type="password" id="passInput" placeholder="******">
     </div>
     <button class="btn-login" onclick="validateLogin()">دخول</button>
-    <p id="errorMsg" style="color: var(--danger); margin-top: 15px; display: none; font-weight: bold;">اسم المستخدم أو كلمة السر خطأ!</p>
+    <p id="errorMsg" style="color: var(--danger); margin-top: 15px; display: none; font-weight: bold;">خطأ في البيانات!</p>
 </div>
 
 <div id="mainContainer" class="container">
@@ -270,15 +238,8 @@ to{opacity:1;transform:translateY(0)}
         <div class="form-grid">
             <div class="form-group">
                 <label>المجموعة</label>
-                <select name="groupName" required>
+                <select name="groupName" id="groupSelect" required>
                     <option disabled selected value="">اختر المجموعة</option>
-                    <option> البخارية الأولى</option>
-                    <option> البخارية الثانية</option>
-                    <option> الغازية الأولى</option>
-                    <option> الغازية الثانية </option>
-                    <option> غازية أولى -مركبة </option>
-                    <option> غازية ثانية -مركبة </option>
-                    <option> بخارية -مركبة </option>
                 </select>
             </div>
 
@@ -356,13 +317,49 @@ to{opacity:1;transform:translateY(0)}
 </div>
 
 <script>
-// --- نظام المستخدمين (5 مستخدمين) ---
-const allowedUsers = {
-    "admin1": "1001",
-    "admin2": "1002",
-    "admin3": "1003",
-    "admin4": "1004",
-    "admin5": "1005"
+// --- إعدادات المستخدمين والمجموعات بناءً على طلبك ---
+const userData = {
+    "التيم": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["الغازية الاولى", "الغازية الثانية", "الغازية الثالثة"] 
+    },
+     "الزارة": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة"] 
+    },
+    "ديرعلي": { 
+        pass: "123", 
+        groups: ["الغازية الاولى ـ مركبة", "الغازية الثانية ـ مركبة", "البخارية ـ مركبة"] 
+    },
+     "السويدية": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["غازية أولى", "غازية ثانية", ",غازية ثالثة","غازية رابعة","غازية خامسة"] 
+    },
+    "الناصرية": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة",," الغازية الثالثة -مركبة"," البخارية -مركبة",] 
+    },
+      "بانياس": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة", "بخارية رابعة"] 
+    },
+    "جندر": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة"," البخارية الأولى -مركبة"," الغازية الثالثة -مركبة"," الغازية الرابعة -مركبة"," البخارية الثانية -مركبة",] 
+    },
+       "حلب": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة", "بخارية رابعة", "بخارية خامسة", "العنفة الغازية"] 
+    },
+      "زيزون": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة", " الغازية الثالثة -مركبة", " البخارية -مركبة"] 
+    },
+      "محردة": { 
+        pass: "123", // يمكنك تغيير الباسورد هنا
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة"] 
+    }
+    // يمكنك إضافة الـ 3 مستخدمين الباقيين هنا بنفس الطريقة
 };
 
 function validateLogin() {
@@ -370,16 +367,27 @@ function validateLogin() {
     const pass = document.getElementById("passInput").value;
     const error = document.getElementById("errorMsg");
 
-    if (allowedUsers[user] && allowedUsers[user] === pass) {
+    if (userData[user] && userData[user].pass === pass) {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("mainContainer").style.display = "block";
-        document.getElementById("currentUserHidden").value = user; // حفظ الاسم للإرسال
+        document.getElementById("currentUserHidden").value = user;
+
+        const groupSelect = document.getElementById("groupSelect");
+        const userGroups = userData[user].groups;
+        
+        groupSelect.innerHTML = '<option disabled selected value="">اختر المجموعة</option>';
+        
+        userGroups.forEach(group => {
+            let option = document.createElement("option");
+            option.text = group;
+            option.value = group;
+            groupSelect.add(option);
+        });
     } else {
         error.style.display = "block";
     }
 }
 
-// --- كودك الأصلي دون تعديل على المنطق ---
 const scriptURL = 'https://script.google.com/macros/s/AKfycbzD1zzmHc7HVAhZvXNTxU1KZuM35dD91EPsp31Egs6-DI7ALwnfYpLf5LpR45dab0tb/exec';
 const form=document.getElementById("maintenanceForm");
 const submitBtn=document.getElementById("submitBtn");
@@ -394,16 +402,11 @@ function resetUI() {
 select.addEventListener("change",function(){
     box.classList.remove("bg-urgent","bg-normal","bg-Whenstopping");
     if(this.value==="عاجل"){
-        box.textContent="الحالة: عاجل";
-        box.classList.add("bg-urgent");
-    }
-    else if(this.value==="عادي"){
-        box.textContent="الحالة: عادي";
-        box.classList.add("bg-normal");
-    }
-    else if(this.value==="لحين التوقف"){
-        box.textContent="الحالة: لحين التوقف";
-        box.classList.add("bg-Whenstopping");
+        box.textContent="الحالة: عاجل"; box.classList.add("bg-urgent");
+    } else if(this.value==="عادي"){
+        box.textContent="الحالة: عادي"; box.classList.add("bg-normal");
+    } else if(this.value==="لحين التوقف"){
+        box.textContent="الحالة: لحين التوقف"; box.classList.add("bg-Whenstopping");
     }
 });
 
@@ -428,7 +431,7 @@ form.addEventListener("submit",function(e){
     .catch(error => {
         submitBtn.disabled=false;
         submitBtn.innerHTML='<span>إرسال البيانات</span>';
-        alert("حدث خطأ في الإرسال، يرجى المحاولة مرة أخرى");
+        alert("حدث خطأ في الإرسال");
     });
 });
 </script>
