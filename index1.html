@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام صيانة المحطات </title>
+
+<style>
+:root{
+    --primary: #0ea5e9;
+    --primary-dark: #0284c7;
+    --primary-light: #38bdf8;
+    Whenstopping: #6366f1;
+    --bg: #0f172a;
+    --card: rgba(30, 41, 59, 0.9);
+    --input: #1e293b;
+    --border: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --shadow: 0 10px 40px rgba(0,0,0,0.3);
+    --shadow-hover: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:'Cairo',sans-serif;
+background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+color:var(--text);
+display:flex;
+justify-content:center;
+align-items: center; 
+min-height: 100vh;
+padding:40px 20px;
+overflow-x: hidden;
+}
+
+/* خلفية متحركة */
+body::before{
+content:'';
+position:fixed;
+top:0; left:0; right:0; bottom:0;
+background:radial-gradient(circle at 20% 80%, rgba(14,165,233,0.15), transparent 40%),
+            radial-gradient(circle at 80% 20%, rgba(99,102,241,0.15), transparent 40%);
+pointer-events:none;
+z-index:-1;
+}
+
+#loginSection {
+    width: 100%;
+    max-width: 450px;
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 50px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: var(--shadow);
+    text-align: center;
+    animation: fadeInUp .6s ease;
+    transition: all 0.3s ease;
+}
+
+#loginSection:hover{
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+}
+
+#mainContainer {
+    display: none;
+    width:100%;
+    max-width:950px;
+    animation: fadeInUp .6s ease;
+}
+
+#adminSection {
+    display: none;
+    width: 100%;
+    max-width: 1200px;
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: var(--shadow);
+    animation: fadeInUp .6s ease;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 12px;
+    background: var(--input);
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text);
+    text-align: center;
+    font-size: 14px;
+}
+
+th, td {
+    padding: 14px 12px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+tr:nth-child(even) {
+    background: rgba(255,255,255,0.03);
+}
+
+tr:hover td {
+    background: rgba(14,165,233,0.1);
+    transform: scale(1.02);
+}
+
+.container{
+width:100%;
+background:var(--card);
+backdrop-filter:blur(20px);
+border-radius:24px;
+padding:55px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:var(--shadow);
+animation:fadeInUp .6s ease;
+}
+
+@keyframes fadeInUp{
+from{opacity:0;transform:translateY(30px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(1)}
+50%{transform:scale(1.05)}
+}
+
+.header-title{
+text-align:center;
+font-size:26px;
+font-weight:700;
+padding:24px;
+margin-bottom:55px;
+border-radius:20px;
+background:linear-gradient(135deg,var(--primary),var(Whenstopping));
+box-shadow:0 10px 30px rgba(14,165,233,0.3);
+color: white;
+letter-spacing: 1px;
+position: relative;
+overflow: hidden;
+}
+
+.header-title::before{
+content:'';
+position:absolute;
+top:0; left:-100%;
+width:100%; height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer{
+0%{left:-100%}
+100%{left:100%}
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:30px;
+}
+
+.form-group{
+display:flex;
+flex-direction:column;
+position:relative;
+text-align: right;
+}
+
+.full-width{
+grid-column:1/-1;
+}
+
+label{
+margin-bottom:10px;
+font-size:16px;
+font-weight:600;
+color:var(--muted);
+transition: all 0.3s ease;
+}
+
+input,select,textarea{
+background:var(--input);
+border:2px solid var(--border);
+border-radius:16px;
+padding:16px;
+font-size:16px;
+color:var(--text);
+transition: all 0.3s ease;
+text-align: right;
+}
+
+input:hover,select:hover,textarea:hover{
+border-color:var(--primary-light);
+transform: translateY(-2px);
+}
+
+input:focus,select:focus,textarea:focus{
+outline:none;
+border-color:var(--primary);
+box-shadow:0 0 0 4px rgba(14,165,233,0.2);
+transform: translateY(-2px);
+}
+
+textarea{
+min-height:130px;
+resize:vertical;
+}
+
+#statusBox{
+margin-top:15px;
+padding:14px;
+border-radius:14px;
+font-weight:600;
+text-align:center;
+background:rgba(255,255,255,0.04);
+border:2px solid var(--border);
+transition: all 0.3s ease;
+}
+
+.bg-urgent{ 
+    background:rgba(239,68,68,0.2)!important; 
+    color:var(--danger); 
+    border-color:var(--danger)!important; 
+    animation: pulse 2s infinite;
+}
+.bg-normal{ 
+    background:rgba(245,158,11,0.2)!important; 
+    color:var(--warning); 
+    border-color:var(--warning)!important; 
+}
+.bg-Whenstopping{ 
+    background:rgba(16,185,129,0.2)!important; 
+    color:var(--success); 
+    border-color:var(--success)!important; 
+}
+
+.btn-container{
+margin-top:50px;
+display:flex;
+gap:20px;
+}
+
+button{
+flex:1;
+padding:18px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+button::before{
+content:'';
+position:absolute;
+top:0; left:0; right:0; bottom:0;
+background:linear-gradient(135deg,transparent,rgba(255,255,255,0.2));
+opacity:0;
+transition: opacity 0.3s ease;
+}
+
+button:hover::before{
+opacity:1;
+}
+
+.btn-submit, .btn-login , .btn-reset{
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+color:white;
+box-shadow:0 10px 30px rgba(14,165,233,0.3);
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+}
+
+.btn-submit:hover, .btn-reset:hover ,.btn-login:hover{
+transform:translateY(-4px);
+box-shadow:0 20px 40px rgba(14,165,233,0.4);
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    color: #000;
+    padding: 8px 15px;
+    font-size: 14px;
+    flex: none;
+    margin: 0 auto;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245,158,11,0.3);
+}
+
+.spinner{
+width:18px; height:18px;
+border:3px solid rgba(255,255,255,0.3);
+border-top:3px solid white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{ to{transform:rotate(360deg)} }
+
+.toast{
+position:fixed; bottom:30px; left:30px;
+padding:16px 24px; border-radius:16px;
+font-weight:600; color:white;
+box-shadow:0 20px 40px rgba(0,0,0,0.4);
+animation:slideIn .4s ease;
+z-index:9999;
+}
+
+@keyframes slideIn{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.view-toggle-btn {
+    background: linear-gradient(135deg,var(--primary),var(Whenstopping));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(14,165,233,0.3);
+}
+
+.view-toggle-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(14,165,233,0.4);
+}
+
+.view-toggle-btn.active {
+    background: linear-gradient(135deg,var(Whenstopping),var(--primary));
+    box-shadow: 0 8px 20px rgba(99,102,241,0.4);
+}
+
+/* تحسينات إضافية للجداول */
+tbody tr{
+    animation: fadeInRow .3s ease;
+}
+
+@keyframes fadeInRow{
+from{opacity:0;transform:translateX(-10px)}
+to{opacity:1;transform:translateX(0)}
+}
+
+/* تحسينات للحقول */
+input,select,textarea{
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* تحسينات للزر */
+button{
+    position: relative;
+    overflow: hidden;
+}
+
+button::after{
+content:'';
+position:absolute;
+top:50%; left:50%;
+width:0; height:0;
+background:rgba(255,255,255,0.3);
+border-radius:50%;
+transform:translate(-50%,-50%);
+transition: width 0.6s, height 0.6s;
+}
+
+button:hover::after{
+width:300px; height:300px;
+}
+
+/* تحسينات للوضع الليلي */
+@media (prefers-color-scheme: dark){
+    :root{
+        --bg: #0f172a;
+        --card: rgba(30, 41, 59, 0.9);
+    }
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px){
+    body{
+        padding:20px 10px;
+    }
+    
+    #loginSection, .container, #adminSection{
+        padding:30px 20px;
+    }
+    
+    .header-title{
+        font-size:22px;
+        padding:16px;
+    }
+    
+    th, td{
+        padding:10px 8px;
+        font-size:13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginSection">
+    <div class="header-title" style="margin-bottom: 30px;">تسجيل الدخول</div>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label>اسم المستخدم</label>
+        <input type="text" id="userInput" placeholder="أدخل اسم المستخدم">
+    </div>
+    <div class="form-group" style="margin-bottom: 30px;">
+        <label>كلمة السر</label>
+        <input type="password" id="passInput" placeholder="******">
+    </div>
+    <button class="btn-login" onclick="validateLogin()">دخول</button>
+    <p id="errorMsg" style="color: var(--danger); margin-top: 15px; display: none; font-weight: bold;">خطأ في البيانات!</p>
+</div>
+
+<div id="adminSection">
+    <div class="header-title">لوحة تحكم المسؤول - كافة الطلبات</div>
+    <div class="table-container">
+        <table id="requestsTable">
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>المحطة</th>
+                    <th>المجموعة</th>
+                    <th>رقم الطلب</th>
+                    <th>تاريخ الطلب</th>
+                    <th>نوع الأعمال</th>
+                    <th>موضوع طلب</th>
+                    <th>الحالة</th>
+                    <th>وضع الطلب</th>
+                    <th>الأعمال المنفذة</th>
+                    <th>القطع التبديلية</th>
+                    <th>ملاحظات</th>
+                                    </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+    <button class="btn-reset" style="margin-top: 20px;" onclick="location.reload()">تسجيل الخروج</button>
+</div>
+
+<div id="mainContainer" class="container">
+    <div class="header-title">إدخال صيانة المحطة</div>
+
+    <div style="text-align: center;">
+        <button class="view-toggle-btn active" id="btnForm" onclick="toggleView('form')">إضافة طلب جديد</button>
+        <button class="view-toggle-btn" id="btnTable" onclick="toggleView('table')">عرض طلباتي</button>
+    </div>
+
+    <div id="formView">
+        <form id="maintenanceForm">
+            <input type="hidden" name="station" value="تشرين">
+            <input type="hidden" name="currentUser" id="currentUserHidden">
+            <input type="hidden" name="row" id="editRow" value="-1">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>المجموعة</label>
+                    <select name="groupName" id="groupSelect" required>
+                        <option disabled selected value="">اختر المجموعة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>رقم طلب الصيانة</label>
+                    <input type="text" name="orderNum" placeholder="أدخل رقم الطلب" required>
+                </div>
+
+                <div class="form-group">
+                    <label>تاريخ الطلب</label>
+                    <input type="date" name="orderDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>نوع العمل</label>
+                    <select name="workType" required>
+                        <option disabled selected value="">اختر نوع العمل</option>
+                        <option>كهرباء</option>
+                        <option>ميكانيك</option>
+                        <option>تحكم</option>
+                        <option>كيمياء</option>
+                        <option>مرافق</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>وضع الطلب</label>
+                    <select name="orderPos" required>
+                        <option disabled selected value="">اختر وضع الطلب</option>
+                        <option>قيد التنفيذ</option>
+                        <option>قيد الاختبار</option>
+                        <option>تم التنفيذ</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="statusSelect" name="status" required>
+                        <option disabled selected value="">اختر الحالة</option>
+                        <option value="عاجل">عاجل</option>
+                        <option value="عادي">عادي</option>
+                        <option value="لحين التوقف">لحين التوقف</option>
+                    </select>
+                    <div id="statusBox">يرجى تحديد الحالة</div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>موضوع الطلب</label>
+                    <textarea name="subject" placeholder="عنوان مختصر"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>الأعمال المنفذة</label>
+                    <textarea name="doneWork" placeholder="ما الذي تم إنجازه؟"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>القطع التبديلية المستخدمة</label>
+                    <textarea name="spareParts" placeholder="ما القطع التبديلية التي تم استخدامها"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>ملاحظات</label>
+                    <textarea name="notes" placeholder="أي ملاحظات إضافية"></textarea>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span>إرسال الطلب</span>
+                </button>
+                <button type="reset" class="btn-reset" onclick="resetUI()">إعادة تعيين</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="tableView" style="display: none;">
+        <div class="header-title" style="margin-bottom: 20px;">سجل طلباتي</div>
+        <div class="table-container">
+            <table id="userRequestsTable">
+                <thead>
+                    <tr>
+                        <th>المجموعة</th>
+                        <th>رقم الطلب</th>
+                        <th>تاريخ الطلب</th>
+                        <th>نوع الأعمال</th>
+                        <th>موضوع طلب</th>
+                        <th>الحالة</th>
+                        <th>وضع الطلب</th>
+                        <th>الأعمال المنفذة</th>
+                        <th>القطع التبديلية</th>
+                        <th>ملاحظات</th>
+                        <th>تعديل</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+
+const userData = {
+    "admin": { pass: "2222", groups: [] },
+    "التيم": { 
+        pass: "123", 
+        groups: ["الغازية الاولى", "الغازية الثانية", "الغازية الثالثة"] 
+    },
+     "الزارة": { 
+        pass: "123",
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة"] 
+    },
+    "ديرعلي": { 
+        pass: "123", 
+        groups: ["الغازية الاولى ـ مركبة", "الغازية الثانية ـ مركبة", "البخارية ـ مركبة"] 
+    },
+     "السويدية": { 
+        pass: "123",
+        groups: ["غازية أولى", "غازية ثانية", ",غازية ثالثة","غازية رابعة","غازية خامسة"] 
+    },
+    "الناصرية": { 
+        pass: "123",
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة"," الغازية الثالثة -مركبة"," البخارية -مركبة"] 
+    },
+      "بانياس": { 
+        pass: "123",
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة", "بخارية رابعة"] 
+    },
+     "جندر": { 
+        pass: "123", 
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة"," البخارية الأولى -مركبة"," الغازية الثالثة -مركبة"," الغازية الرابعة -مركبة"," البخارية الثانية -مركبة"] 
+    },
+       "حلب": { 
+        pass: "123", 
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة", "بخارية رابعة", "بخارية خامسة", "العنفة الغازية"] 
+    },
+      "زيزون": { 
+        pass: "123",
+        groups: [" الغازية الأولى -مركبة", " الغازية الثانية -مركبة", " الغازية الثالثة -مركبة", " البخارية -مركبة"] 
+    },
+      "محردة": { 
+        pass: "123", 
+        groups: ["بخارية أولى", "بخارية ثانية", "بخارية ثالثة"] 
+    },
+     "تشرين بخاري": { 
+        pass: "123", 
+        groups: ["بخارية أولى", "بخارية ثانية"] 
+    },
+      "تشرين غازي": { 
+        pass: "123", 
+        groups: ["غازية أولى", "غازية ثانية"] 
+    },
+      "تشرين مركبة": { 
+        pass: "123", 
+        groups: [ "الغازية الأولى- مركبة", "الغازية الثانية- مركبة", "البخارية- مركبة"] 
+    },
+      "بانياس غازي": { 
+        pass: "123", 
+        groups: [ "غازية أولى ","غازية ثانية "] 
+    },
+        "جندر توسع": { 
+        pass: "123", 
+        groups: [ "الغازية الأولى- مركبة ","الغازية الثانية- مركبة ","البخارية- مركبة"] 
+    },
+       "ديرعلي توسع": { 
+        pass: "123", 
+        groups: [ "الغازية الأولى- مركبة ","الغازية الثانية- مركبة ","البخارية- مركبة"] 
+    }
+};
+
+// رابط السكربت (تأكد من صحة الرابط الخاص بك)
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxQ1yTdULv7w1vdN6wxmcS19vsPyBh5x4W0uLTaaryy3RUyghwg-TBibzRv__QCJgySdg/exec';
+
+// ===============================
+// دالة تنسيق التاريخ (يوم/شهر/سنة)
+// ===============================
+function formatDate(dateString) {
+    if (!dateString || dateString === "-" || dateString === "") return "-";
+    
+    try {
+        let date;
+        
+        if (typeof dateString === 'string') {
+            if (dateString.includes('T')) {
+                date = new Date(dateString);
+            } else {
+                date = new Date(dateString);
+            }
+        } else if (typeof dateString === 'number') {
+            date = new Date(dateString);
+        } else {
+            return dateString;
+        }
+        
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${day}/${month}/${year}`;
+    } catch (e) {
+        return dateString;
+    }
+}
+
+// ===============================
+// وظائف النظام
+// ===============================
+
+function validateLogin() {
+    const user = document.getElementById("userInput").value;
+    const pass = document.getElementById("passInput").value;
+    const error = document.getElementById("errorMsg");
+
+    if (userData[user] && userData[user].pass === pass) {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("currentUserHidden").value = user;
+
+        if(user === "admin") {
+            document.getElementById("adminSection").style.display = "block";
+            loadAdminData();
+        } else {
+            document.getElementById("mainContainer").style.display = "block";
+            
+            const groupSelect = document.getElementById("groupSelect");
+            const userGroups = userData[user].groups;
+            
+            groupSelect.innerHTML = '<option disabled selected value="">اختر المجموعة</option>';
+            
+            userGroups.forEach(group => {
+                let option = document.createElement("option");
+                option.text = group;
+                option.value = group;
+                groupSelect.add(option);
+            });
+            
+            loadUserRequests();
+        }
+    } else {
+        error.style.display = "block";
+    }
+}
+
+// ===============================
+// جلب البيانات للأدمن (الكل) - بدون زر تعديل
+// ===============================
+function loadAdminData() {
+    const tableBody = document.getElementById("tableBody");
+    tableBody.innerHTML = '<tr><td colspan="12">جاري تحميل البيانات...</td></tr>';
+
+    fetch(scriptURL + '?action=get')
+    .then(response => response.json())
+    .then(data => {
+        tableBody.innerHTML = "";
+        if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="12" style="color:var(--muted)">لا توجد بيانات حالياً</td></tr>';
+            return;
+        }
+        data.forEach(row => {
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${row.currentUser || row.user || 'غير معروف'}</td>
+                <td>تشرين</td>
+                <td>${row.groupName || '-'}</td>
+                <td>${row.orderNum || '-'}</td>
+                <td>${formatDate(row.orderDate)}</td>
+                <td>${row.workType || '-'}</td>
+                <td>${row.subject || '-'}</td>
+                <td>${row.status || '-'}</td>
+                <td>${row.orderPos || '-'}</td>
+                <td>${row.doneWork || '-'}</td>
+                <td>${row.spareParts || '-'}</td>
+                <td>${row.notes || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    })
+    .catch(err => {
+        console.error("Error loading data:", err);
+        tableBody.innerHTML = '<tr><td colspan="12" style="color:var(--danger)">فشل تحميل البيانات</td></tr>';
+    });
+}
+
+// ===============================
+// جلب بيانات المستخدم (طلباته فقط) - مع زر تعديل
+// ===============================
+function loadUserRequests() {
+    const tableBody = document.getElementById("userTableBody");
+    const currentUser = document.getElementById("currentUserHidden").value;
+    
+    tableBody.innerHTML = '<tr><td colspan="11">جاري تحميل طلباتك...</td></tr>';
+
+    fetch(scriptURL + '?action=get')
+    .then(response => response.json())
+    .then(data => {
+        tableBody.innerHTML = "";
+        
+        const myRequests = data.filter(row => row.currentUser === currentUser);
+
+        if (myRequests.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="11" style="color:var(--muted)">لا توجد طلبات مسجلة لك حتى الآن</td></tr>';
+            return;
+        }
+
+        myRequests.forEach((row, index) => {
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${row.groupName || '-'}</td>
+                <td>${row.orderNum || '-'}</td>
+                <td>${formatDate(row.orderDate)}</td>
+                <td>${row.workType || '-'}</td>
+                <td>${row.subject || '-'}</td>
+                <td>${row.status || '-'}</td>
+                <td>${row.orderPos || '-'}</td>
+                <td>${row.doneWork || '-'}</td>
+                <td>${row.spareParts || '-'}</td>
+                <td>${row.notes || '-'}</td>
+                <td><button class="btn-edit" onclick="editRow(${row.row || 0})">تعديل</button></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    })
+    .catch(err => {
+        console.error("Error loading user data:", err);
+        tableBody.innerHTML = '<tr><td colspan="11" style="color:var(--danger)">فشل تحميل البيانات</td></tr>';
+    });
+}
+
+// ===============================
+// التبديل بين النموذج والجدول
+// ===============================
+function toggleView(view) {
+    const formView = document.getElementById('formView');
+    const tableView = document.getElementById('tableView');
+    const btnForm = document.getElementById('btnForm');
+    const btnTable = document.getElementById('btnTable');
+    
+    if (view === 'form') {
+        formView.style.display = 'block';
+        tableView.style.display = 'none';
+        btnForm.classList.add('active');
+        btnTable.classList.remove('active');
+        resetUI();
+    } else {
+        formView.style.display = 'none';
+        tableView.style.display = 'block';
+        btnForm.classList.remove('active');
+        btnTable.classList.add('active');
+        loadUserRequests();
+    }
+}
+
+// ===============================
+// تعبئة النموذج للتعديل (جلب من السكربت)
+// ===============================
+function editRow(rowNumber) {
+    if (!rowNumber || rowNumber === 0) {
+        alert("خطأ: رقم الصف غير صحيح");
+        return;
+    }
+
+    fetch(scriptURL + '?action=getRow&row=' + rowNumber)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("groupSelect").value = data.groupName || "";
+        document.querySelector('input[name="orderNum"]').value = data.orderNum || "";
+        document.querySelector('input[name="orderDate"]').value = data.orderDate || "";
+        document.querySelector('select[name="workType"]').value = data.workType || "";
+        document.querySelector('select[name="orderPos"]').value = data.orderPos || "";
+        document.querySelector('select[name="status"]').value = data.status || "";
+        document.querySelector('textarea[name="subject"]').value = data.subject || "";
+        document.querySelector('textarea[name="doneWork"]').value = data.doneWork || "";
+        document.querySelector('textarea[name="spareParts"]').value = data.spareParts || "";
+        document.querySelector('textarea[name="notes"]').value = data.notes || "";
+
+        document.getElementById("editRow").value = rowNumber;
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.innerHTML = '<span>تحديث الطلب</span>';
+        submitBtn.style.background = "linear-gradient(135deg, #f59e0b, #d977706)";
+
+        document.getElementById('formView').style.display = 'block';
+        document.getElementById('tableView').style.display = 'none';
+
+        const statusSelect = document.getElementById("statusSelect");
+        const box = document.getElementById("statusBox");
+        statusSelect.value = data.status || "";
+        updateStatusBox(data.status || "");
+    })
+    .catch(err => {
+        console.error("Error loading row:", err);
+        alert("فشل تحميل البيانات للتعديل");
+    });
+}
+
+// ===============================
+// تحديث صندوق الحالة
+// ===============================
+function updateStatusBox(status) {
+    const box = document.getElementById("statusBox");
+    box.classList.remove("bg-urgent", "bg-normal", "bg-Whenstopping");
+    
+    if(status === "عاجل"){
+        box.textContent = "الحالة: عاجل"; 
+        box.classList.add("bg-urgent");
+    } else if(status === "عادي"){
+        box.textContent = "الحالة: عادي"; 
+        box.classList.add("bg-normal");
+    } else if(status === "لحين التوقف"){
+        box.textContent = "الحالة: لحين التوقف"; 
+        box.classList.add("bg-Whenstopping");
+    }
+}
+
+// ===============================
+// إعادة تعيين النموذج
+// ===============================
+function resetUI() {
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.innerHTML = '<span>إرسال الطلب</span>';
+    submitBtn.style.background = "linear-gradient(135deg,var(--primary),var(--primary-dark))";
+    
+    const statusSelect = document.getElementById("statusSelect");
+    const box = document.getElementById("statusBox");
+    statusSelect.value = "";
+    box.textContent = "يرجى تحديد الحالة";
+    box.classList.remove("bg-urgent", "bg-normal", "bg-Whenstopping");
+    
+    document.getElementById("editRow").value = "-1";
+}
+
+// ===============================
+// إرسال النموذج (إضافة أو تحديث)
+// ===============================
+const form = document.getElementById("maintenanceForm");
+const submitBtn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const isEditMode = submitBtn.innerHTML.includes("تحديث");
+    const rowNumber = document.getElementById("editRow").value;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<div class="spinner"></div> جاري الحفظ';
+
+    const formData = new FormData(form);
+    
+    formData.append("action", isEditMode ? "update" : "add");
+    
+    if (isEditMode && rowNumber !== "-1") {
+        formData.append("row", rowNumber);
+    }
+
+    fetch(scriptURL, { method: 'POST', body: formData})
+    .then(response => response.text())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = isEditMode ? '<span>تم التحديث</span>' : '<span>إرسال الطلب</span>';
+        
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.style.background = "linear-gradient(135deg,#10b981,#059669)";
+        toast.textContent = isEditMode ? "تم تحديث البيانات بنجاح ✔" : "تم إرسال البيانات بنجاح ✔";
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+            form.reset();
+            resetUI();
+            if(isEditMode) {
+                loadUserRequests();
+                toggleView('table');
+            }
+        }, 3000);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = isEditMode ? '<span>تحديث الطلب</span>' : '<span>إرسال الطلب</span>';
+        alert("حدث خطأ في الإرسال: " + error.message);
+    });
+});
+
+// ===============================
+// مستمع لتغيير الحالة
+// ===============================
+const select = document.getElementById("statusSelect");
+select.addEventListener("change", function() {
+    updateStatusBox(this.value);
+});
+
+</script>
+
+</body>
+</html>
