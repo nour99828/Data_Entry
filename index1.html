@@ -7,10 +7,10 @@
 
 <style>
 :root{
-    --primary: #0ea5e9;
+    --primary: #295366;
     --primary-dark: #0284c7;
     --primary-light: #38bdf8;
-    Whenstopping: #6366f1;
+   --Whenstopping: #6366f1;
     --bg: #0f172a;
     --card: rgba(30, 41, 59, 0.9);
     --input: #1e293b;
@@ -156,7 +156,7 @@ font-weight:700;
 padding:24px;
 margin-bottom:55px;
 border-radius:20px;
-background:linear-gradient(135deg,var(--primary),var(Whenstopping));
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
 box-shadow:0 10px 30px rgba(14,165,233,0.3);
 color: white;
 letter-spacing: 1px;
@@ -345,7 +345,7 @@ z-index:9999;
 @keyframes slideIn{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
 .view-toggle-btn {
-    background: linear-gradient(135deg,var(--primary),var(Whenstopping));
+    background: linear-gradient(135deg,var(--primary),var(--Whenstopping));
     color: white;
     border: none;
     padding: 12px 24px;
@@ -364,7 +364,7 @@ z-index:9999;
 }
 
 .view-toggle-btn.active {
-    background: linear-gradient(135deg,var(Whenstopping),var(--primary));
+    background: linear-gradient(135deg,var(--Whenstopping),var(--primary));
     box-shadow: 0 8px 20px rgba(99,102,241,0.4);
 }
 
